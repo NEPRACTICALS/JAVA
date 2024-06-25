@@ -20,6 +20,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String accountNumber;
+    @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
     @ManyToOne
@@ -34,4 +35,7 @@ public class Account {
 
     @OneToOne(mappedBy = "account")
     private Withdraw withdraw;
+
+    private  String message ;
+    private UUID messageId;
 }

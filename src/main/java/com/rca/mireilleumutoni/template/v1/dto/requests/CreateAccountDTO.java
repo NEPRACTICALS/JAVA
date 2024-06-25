@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class CreateAccountDTO {
     private String accountNumber;
-    private AccountType accountType ;
+    private String accountType ;
     private UUID customerId;
     private float balance;
     private float amount ;

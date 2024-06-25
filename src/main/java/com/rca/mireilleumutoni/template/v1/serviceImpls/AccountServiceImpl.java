@@ -1,6 +1,8 @@
 package com.rca.mireilleumutoni.template.v1.serviceImpls;
 
 import com.rca.mireilleumutoni.template.v1.dto.requests.CreateAccountDTO;
+import com.rca.mireilleumutoni.template.v1.enums.AccountType;
+import com.rca.mireilleumutoni.template.v1.mailHandling.MailService;
 import com.rca.mireilleumutoni.template.v1.models.Account;
 import com.rca.mireilleumutoni.template.v1.models.Customer;
 import com.rca.mireilleumutoni.template.v1.repositories.AccountRepository;
@@ -11,7 +13,6 @@ import com.rca.mireilleumutoni.template.v1.utils.ExceptionUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class AccountServiceImpl implements AccountService {
             Customer customer = customerRepository.findById(createAccountDTO.getCustomerId()).orElseThrow(() -> new RuntimeException("Customer not found"));
             Account account = new Account();
             account.setAccountNumber(createAccountDTO.getAccountNumber());
-            account.setAccountType(createAccountDTO.getAccountType());
+            account.setAccountType(AccountType.valueOf(createAccountDTO.getAccountType()));
             account.setBalance(createAccountDTO.getBalance());
             account.setAmount(createAccountDTO.getAmount());
             account.setCustomer(customerService.getCustomerById(createAccountDTO.getCustomerId()));
@@ -92,8 +93,7 @@ public class AccountServiceImpl implements AccountService {
             String subject = "Withdrawal Notification";
             String body = String.format("Dear %s, your withdrawal of %.2f from account %s has been completed successfully.",
                     customer.getFirstName(), amount, account.getId());
-
-            mailService.sendTransactionEmail(customer, amount, "Withdrawal", account.getAccountNumber());
+            mailService.sendEmail(customer.getEmail(), "Withdrawal", "Dear " + customer.getFirstName() + ", your withdrawal of " + amount + " from account " + account.getId() + " has been completed successfully.");
 
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);
@@ -118,16 +118,20 @@ public class AccountServiceImpl implements AccountService {
             Account account = accountRepository.findById(accountId)
                     .orElseThrow(() -> new RuntimeException("Account not found"));
 
+
             Customer customer = account.getCustomer();
-
-            account.setBalance(account.getBalance() + amount);
-            accountRepository.save(account);
-
             String subject = "Deposit Notification";
             String body = String.format("Dear %s, your deposit of %.2f to account %s has been completed successfully.",
                     customer.getFirstName(), amount, account.getId());
+            UUID uuid = UUID.randomUUID();
+            account.setBalance(account.getBalance() + amount);
+            account.setMessageId(uuid);
+            account.setMessage( "Deposit of " + amount + " to account " + account.getId() + " has been completed successfully."  );
+            accountRepository.save(account);
 
-            mailService.sendTransactionEmail(customer, amount, "Deposit", account.getAccountNumber());
+
+
+            mailService.sendEmail(customer.getEmail(), "Deposit", "Dear " + customer.getFirstName() + ", your deposit of " + amount + " to account " + account.getId() + " has been completed successfully.");
 
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);
