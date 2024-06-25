@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,9 +19,13 @@ import java.util.UUID;
 @Component
 
 public class CreateWithdrawDTO {
+    @NotNull
     private UUID customerId;
+    @NotNull
     private UUID accountId;
+    @NotNull
     private float amount;
+    @NotNull
     private Date bankingTime ;
 
 }

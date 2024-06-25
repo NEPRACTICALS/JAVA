@@ -121,7 +121,6 @@ public class AccountController {
     public ResponseEntity<ApiResponse> withdraw(@RequestParam UUID accountId, @RequestParam float amount) {
         try {
             accountService.withdraw(accountId, amount);
-            Customer customer = accountService.getCustomerByAccountId(accountId);
             return ResponseEntity.ok(new ApiResponse(true, "Withdrawal successful"));
         } catch (Exception e) {
             return ExceptionUtils.handleControllerExceptions(e);

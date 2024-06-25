@@ -21,15 +21,26 @@ import java.util.UUID;
 public class CreateCustomerDTO {
     @NotNull
     @Min(2)
-    @Email
+
     private  String firstName;
+    @NotNull
+    @Min(2)
     private  String lastName;
+    @NotNull
     @Email
     private  String email;
+    @NotNull
+    @Min(2)
     private  String mobile;
+    @NotNull
+    @Min(2)
 
     private Date dob;
+    @NotNull
+    @Min(2)
     private float balance;
+    @NotNull
+    @Min(2)
     private Date  lastUpdateDateTime;
 
 }

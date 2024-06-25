@@ -78,6 +78,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void withdraw(UUID accountId, float amount) {
         try {
+            System.out.println("WITHDRAWAL");
             Account account = accountRepository.findById(accountId)
                     .orElseThrow(() -> new RuntimeException("Account not found"));
 
@@ -88,12 +89,19 @@ public class AccountServiceImpl implements AccountService {
             }
 
             account.setBalance(account.getBalance() - amount);
-            accountRepository.save(account);
 
             String subject = "Withdrawal Notification";
             String body = String.format("Dear %s, your withdrawal of %.2f from account %s has been completed successfully.",
                     customer.getFirstName(), amount, account.getId());
+
+            UUID uuid = UUID.randomUUID();
+            System.out.println("RANDOM 1: " + UUID.randomUUID());
+            account.setMessageId(uuid);
+            System.out.println("RANDOM 2: " + UUID.randomUUID());
+            account.setMessage( "Withdraw of " + amount + " to account " + account.getId() + " has been completed successfully."  );
+            accountRepository.save(account);
             mailService.sendEmail(customer.getEmail(), "Withdrawal", "Dear " + customer.getFirstName() + ", your withdrawal of " + amount + " from account " + account.getId() + " has been completed successfully.");
+
 
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);
@@ -121,18 +129,15 @@ public class AccountServiceImpl implements AccountService {
 
             Customer customer = account.getCustomer();
             String subject = "Deposit Notification";
-            String body = String.format("Dear %s, your deposit of %.2f to account %s has been completed successfully.",
-                    customer.getFirstName(), amount, account.getId());
+            String body = String.format("Dear %s, your deposit of %.2f to account %s has been completed successfully.", customer.getFirstName(), amount, account.getId());
             UUID uuid = UUID.randomUUID();
             account.setBalance(account.getBalance() + amount);
+            System.out.println("RANDOM 1: " + UUID.randomUUID());
             account.setMessageId(uuid);
+            System.out.println("RANDOM 2: " + UUID.randomUUID());
             account.setMessage( "Deposit of " + amount + " to account " + account.getId() + " has been completed successfully."  );
             accountRepository.save(account);
-
-
-
             mailService.sendEmail(customer.getEmail(), "Deposit", "Dear " + customer.getFirstName() + ", your deposit of " + amount + " to account " + account.getId() + " has been completed successfully.");
-
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);
         }

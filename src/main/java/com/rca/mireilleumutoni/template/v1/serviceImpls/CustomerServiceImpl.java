@@ -139,6 +139,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -209,6 +211,9 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setLastName(createCustomerDTO.getLastName());
             customer.setMobile(createCustomerDTO.getMobile());
             customer.setEmail(createCustomerDTO.getEmail());
+            if (createCustomerDTO.getDob().after(Date.valueOf(LocalDate.now()))){
+                throw new RuntimeException("Invalid date of birth");
+            }
             customer.setDob(createCustomerDTO.getDob());
             customer.setBalance(createCustomerDTO.getBalance());
             customer.setLastUpdateDateTime(createCustomerDTO.getLastUpdateDateTime());
@@ -222,22 +227,32 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public void transferAmount(UUID customerId, UUID accountId, float amount) {
+    public void transferAmount(UUID sendId, UUID receiverId, float amount) {
         try {
-            Customer customer = customerRepository.findById(customerId)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-            Account account = accountRepository.findById(accountId)
+
+            Account account = accountRepository.findById(sendId)
                     .orElseThrow(() -> new RuntimeException("Account not found"));
 
-            if (customer.getBalance() < amount) {
+            Account account1 = accountRepository.findById(receiverId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+            if (account.getBalance() < amount) {
                 throw new RuntimeException("Insufficient balance");
             }
 
-            customer.setBalance(customer.getBalance() - amount);
-            account.setBalance(account.getBalance() + amount);
+            account1.setBalance(account1.getBalance() + amount);
+            account.setBalance(account.getBalance() - amount);
+            UUID uuid = UUID.randomUUID();
+            UUID uuid1 = UUID.randomUUID();
+            System.out.println("RANDOM 1: " + UUID.randomUUID());
 
-            customerRepository.save(customer);
+            account.setMessageId(uuid);
+            account1.setMessageId(uuid1);
+            account.setMessage( "transfer of " + amount + " to account " + account.getId() + " has been completed successfully."  );
+
+
+            accountRepository.save(account1);
             accountRepository.save(account);
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);
