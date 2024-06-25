@@ -72,7 +72,9 @@
 package com.rca.mireilleumutoni.template.v1.controllers;
 
 import com.rca.mireilleumutoni.template.v1.dto.requests.CreateAccountDTO;
+import com.rca.mireilleumutoni.template.v1.models.Customer;
 import com.rca.mireilleumutoni.template.v1.payload.ApiResponse;
+import com.rca.mireilleumutoni.template.v1.serviceImpls.MailService;
 import com.rca.mireilleumutoni.template.v1.services.AccountService;
 import com.rca.mireilleumutoni.template.v1.utils.ExceptionUtils;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +90,7 @@ import java.util.UUID;
 public class AccountController {
 
     private final AccountService accountService;
+    private  final MailService mailService;
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createAccount(@Validated @RequestBody CreateAccountDTO createAccountDTO){
@@ -120,6 +123,8 @@ public class AccountController {
     public ResponseEntity<ApiResponse> withdraw(@RequestParam UUID accountId, @RequestParam float amount) {
         try {
             accountService.withdraw(accountId, amount);
+            Customer customer = accountService.getCustomerByAccountId(accountId);
+            mailService.sendTransactionEmail(customer, amount, "withdrawal", "Withdrawal Notification");
             return ResponseEntity.ok(new ApiResponse(true, "Withdrawal successful"));
         } catch (Exception e) {
             return ExceptionUtils.handleControllerExceptions(e);
@@ -130,6 +135,8 @@ public class AccountController {
     public ResponseEntity<ApiResponse> deposit(@RequestParam UUID accountId, @RequestParam float amount) {
         try {
             accountService.deposit(accountId, amount);
+            Customer customer = accountService.getCustomerByAccountId(accountId);
+            mailService.sendTransactionEmail(customer, amount, "deposit", "Deposit Notification");
             return ResponseEntity.ok(new ApiResponse(true, "Deposit successful"));
         } catch (Exception e) {
             return ExceptionUtils.handleControllerExceptions(e);

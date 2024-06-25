@@ -22,7 +22,7 @@ public class AccountServiceImpl implements AccountService {
     @Lazy
     private final CustomerService customerService;
     private final CustomerRepository customerRepository;
-    private  final EmailService emailService ;
+    private  final MailService mailService ;
 
 
     @Override
@@ -93,11 +93,23 @@ public class AccountServiceImpl implements AccountService {
             String body = String.format("Dear %s, your withdrawal of %.2f from account %s has been completed successfully.",
                     customer.getFirstName(), amount, account.getId());
 
-            emailService.sendEmail(customer.getEmail(), subject, body);
+            mailService.sendTransactionEmail(customer, amount, "Withdrawal", account.getAccountNumber());
 
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);
         }
+    }
+
+    @Override
+    public Customer getCustomerByAccountId(UUID accountId) {
+        try {
+            Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new RuntimeException("Account not found"));
+            return account.getCustomer();
+        } catch (Exception e) {
+            ExceptionUtils.handleServiceExceptions(e);
+        }
+        return null;
     }
 
     @Override
@@ -115,7 +127,7 @@ public class AccountServiceImpl implements AccountService {
             String body = String.format("Dear %s, your deposit of %.2f to account %s has been completed successfully.",
                     customer.getFirstName(), amount, account.getId());
 
-            emailService.sendEmail(customer.getEmail(), subject, body);
+            mailService.sendTransactionEmail(customer, amount, "Deposit", account.getAccountNumber());
 
         } catch (Exception e) {
             ExceptionUtils.handleServiceExceptions(e);

@@ -2,6 +2,7 @@ package com.rca.mireilleumutoni.template.v1.services;
 
 import com.rca.mireilleumutoni.template.v1.dto.requests.CreateAccountDTO;
 import com.rca.mireilleumutoni.template.v1.models.Account;
+import com.rca.mireilleumutoni.template.v1.models.Customer;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,4 +14,6 @@ public interface AccountService {
   List   <Account> getAllAccounts();
     void deposit(UUID accountId, float amount);
     void withdraw(UUID accountId, float amount);
+
+    Customer getCustomerByAccountId(UUID accountId);
 }
