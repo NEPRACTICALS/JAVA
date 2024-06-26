@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
@@ -18,11 +19,15 @@ import java.util.UUID;
 
 public class CreateSaveDTO {
     @NotNull
+    @NotBlank
     private UUID customerId;
     @NotNull
+    @NotBlank
     private UUID accountId;
     @NotNull
+    @NotBlank
     private float amount;
     @NotNull
+    @NotBlank
     private Date bankingTime ;
 }

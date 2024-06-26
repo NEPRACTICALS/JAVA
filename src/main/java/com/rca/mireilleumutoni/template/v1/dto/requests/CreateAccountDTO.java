@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -19,13 +20,18 @@ import java.util.UUID;
 
 public class CreateAccountDTO {
     @NotNull
+    @NotBlank
     private String accountNumber;
     @NotNull
+    @NotBlank
     private String accountType ;
     @NotNull
+    @NotBlank
     private UUID customerId;
     @NotNull
+    @NotBlank
     private float balance;
     @NotNull
+    @NotBlank
     private float amount ;
 }

@@ -129,6 +129,7 @@
 package com.rca.mireilleumutoni.template.v1.serviceImpls;
 
 import com.rca.mireilleumutoni.template.v1.dto.requests.CreateCustomerDTO;
+import com.rca.mireilleumutoni.template.v1.mailHandling.MailService;
 import com.rca.mireilleumutoni.template.v1.models.Account;
 import com.rca.mireilleumutoni.template.v1.models.Customer;
 import com.rca.mireilleumutoni.template.v1.repositories.AccountRepository;
@@ -150,6 +151,7 @@ import java.util.UUID;
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
+    private  final MailService mailService ;
 
     @Override
     @Transactional
@@ -240,6 +242,7 @@ public class CustomerServiceImpl implements CustomerService {
             if (account.getBalance() < amount) {
                 throw new RuntimeException("Insufficient balance");
             }
+            Customer customer =  new Customer();
 
             account1.setBalance(account1.getBalance() + amount);
             account.setBalance(account.getBalance() - amount);
@@ -250,6 +253,8 @@ public class CustomerServiceImpl implements CustomerService {
             account.setMessageId(uuid);
             account1.setMessageId(uuid1);
             account.setMessage( "transfer of " + amount + " to account " + account.getId() + " has been completed successfully."  );
+            mailService.sendEmail(account.getCustomer().getEmail(), "Transfer ", "Dear " + account.getCustomer().getEmail() + ", you have  transferred  " + amount + " from account " + account.getId() + "to" + account1.getCustomer().getEmail()+ "successfully");
+
 
 
             accountRepository.save(account1);
